@@ -1,0 +1,15 @@
+# config.yaml
+general:
+  number_of_cities: 1
+  land_area_file: landarea.csv
+  world_cities_file: worldcities.csv                            # If we want to set the dataset to be HDF5, if not, will export as .pngs 
+  country_probabilities_file: country_probabilities.csv         # File location of the probabilities of each country based on land area
+  dataset_size: 10                                              # Size of the dataset (default: 15000) 
+  hdf5: true                                                    # If we want to set the dataset to be HDF5, if not, will export as .pngs 
+  hdf5_filename: gws10.h5
+  debug_mode: false
+image:
+  width: 512
+  height: 512
+  views: 2
+  random_heading: true

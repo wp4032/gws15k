@@ -1,0 +1,4 @@
+__pycache__
+.env.local
+test
+*.h5

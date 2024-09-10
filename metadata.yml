@@ -1,0 +1,24 @@
+name: Google World Streets 15k (gws15k) Creator
+description: gws15k is a state-of-the-art dataset for training geolocation models. However, the dataset is not open-source and needs to be generated on one's own. However, this repository makes it easy to generate the dataset by yourself.
+contributors:
+- name: William Pan
+data:
+- name: gws15k.h5
+  path: gws15k.h5
+  format: hdf5
+  fields:
+  - name: country
+    description: The country where the street view image was captured
+  - name: city
+    description: The city where the street view image was captured
+  - name: lat
+    description: The latitude coordinate of the street view image location
+  - name: lon
+    description: The longitude coordinate of the street view image location
+  - name: headings
+    description: The viewing directions (in degrees) for each captured image
+  - name: images
+    description: The street view images captured at the specified location and headings
+license:
+- name: Google APIs Terms of Service
+  link: https://developers.google.com/terms
