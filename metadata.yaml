@@ -1,3 +1,4 @@
+# metadata.yaml
 name: Google World Streets 15k (gws15k) Creator
 description: gws15k is a state-of-the-art dataset for training geolocation models. However, the dataset is not open-source and needs to be generated on one's own. However, this repository makes it easy to generate the dataset by yourself.
 contributors:

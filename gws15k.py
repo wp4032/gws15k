@@ -1,5 +1,4 @@
 import random
-
 import time
 import pickle
 import requests
@@ -11,9 +10,9 @@ import numpy as np
 from dataclasses import dataclass
 from PIL import Image
 from io import BytesIO
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Any
 from dotenv import load_dotenv
-from utils import get_unique_column_values, read_csv
+from utils import read_csv
 
 # __________________________________________________________________
 # ___________________________ VARIABLES ____________________________
@@ -35,8 +34,6 @@ DATASET_SIZE = config['general']['dataset_size']
 DATASET_FILETYPE = config['general']['hdf5']
 HDF5_FILENAME = config['general']['hdf5_filename']
 DEBUG_MODE = config['general']['debug_mode']
-
-NUMBER_OF_CITIES = config['general']['number_of_cities']
 
 IMAGE_WIDTH = config['image']['width']
 IMAGE_HEIGHT = config['image']['height']
@@ -87,7 +84,7 @@ def gps_coord_from_city(city: str, coordinate_dict: Dict[str, Tuple[float, float
   
   return coordinate_dict[city]
 
-def get_nearby_street_view_image(info_dict: LocationData, radius: int = 10000) -> List[str]:
+def get_nearby_street_view_image(info_dict: Dict[str, Any], radius: int = 10000) -> List[str]:
     # Step 1: Find a nearby place or location using the Places API
     places_url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     places_params = {
@@ -115,9 +112,9 @@ def get_nearby_street_view_image(info_dict: LocationData, radius: int = 10000) -
     street_view_url = f"https://maps.googleapis.com/maps/api/streetview"
 
     headings = {
-        1: [0],            # Front view only
-        2: [0, 90],        # Front and right
-        3: [0, 90, 180],   # Front, right, and back
+        1: [0],               # Front view only
+        2: [0, 90],           # Front and right
+        3: [0, 90, 180],      # Front, right, and back
         4: [0, 90, 180, 270]  # Front, right, back, and left
     }
 
@@ -176,11 +173,11 @@ def _get_coordinate_dictionary() -> Dict[str, Tuple[float, float]]:
   with open("city_dict_with_coords.pkl", "rb") as file:
     return pickle.load(file)
 
-def _crop_image(image):
+def _crop_image(image: bytes) -> Image.Image:
   image = Image.open(BytesIO(image))
   return image.crop((0, 0, IMAGE_WIDTH, IMAGE_HEIGHT))
 
-def _save_image_from_url(response, tag: int, location_dict, filetype: str) -> None:
+def _save_image_from_url(response: requests.Response, tag: int, location_dict: Dict[str, Any], filetype: str) -> None:
   cropped_image = _crop_image(response.content)
   
   # Check if the filetype is valid
@@ -193,13 +190,13 @@ def _save_image_from_url(response, tag: int, location_dict, filetype: str) -> No
   cropped_image.save(save_path)
   print(f"Cropped image successfully saved to {save_path}")
 
-def _save_jpg_from_url(response, tag: int, location_dict) -> None:
+def _save_jpg_from_url(response: requests.Response, tag: int, location_dict: Dict[str, Any]) -> None:
   _save_image_from_url(response, tag, location_dict, "jpg")
 
-def _save_png_from_url(response, tag: int, location_dict) -> None:
+def _save_png_from_url(response: requests.Response, tag: int, location_dict: Dict[str, Any]) -> None:
   _save_image_from_url(response, tag, location_dict, "png")
 
-def _save_images_from_urls(location_dict, filetype: str) -> None:
+def _save_images_from_urls(location_dict: Dict[str, Any], filetype: str) -> None:
   i = 0
   for image_url in location_dict['image_urls']:
     try:
@@ -215,7 +212,7 @@ def _save_images_from_urls(location_dict, filetype: str) -> None:
       print(f"An error occurred while processing the image: {e}")
     i += 1
 
-def _add_npimages_from_urls(location_dict) -> None:
+def _add_npimages_from_urls(location_dict: Dict[str, Any]) -> None:
   for image_url in location_dict['image_urls']:
     try:
       # Send a GET request to the URL to retrieve the image
@@ -241,7 +238,7 @@ def _add_npimages_from_urls(location_dict) -> None:
     except Exception as e:
       print(f"An error occurred while processing the image: {e}")
 
-def _add_to_hdf5(hdf5_filename, data_dict):
+def _add_to_hdf5(hdf5_filename: str, data_dict: Dict[str, Any]):
   with h5py.File(hdf5_filename, 'a') as hdf5_file:
     # Generate unique identifier for group
     image_id = f"image_{len(hdf5_file.keys())}"
